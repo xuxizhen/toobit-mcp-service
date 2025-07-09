@@ -9,8 +9,8 @@ app.use(express.json());
 
 app.use('/mcp/spot', spotController);
 
-// MCP /tools endpoint (JSON-RPC 2.0)
-app.post('/tools', async (req, res) => {
+// MCP /api/tools endpoint (JSON-RPC 2.0)
+app.post('/api/tools', async (req, res) => {
   const { jsonrpc, id, method, params } = req.body;
   if (jsonrpc !== '2.0') {
     return res.status(400).json({ jsonrpc: '2.0', id, error: { code: -32600, message: 'Invalid JSON-RPC version' } });
@@ -46,6 +46,10 @@ app.post('/tools', async (req, res) => {
 
   // 预留tools/call等方法
   return res.status(404).json({ jsonrpc: '2.0', id, error: { code: -32601, message: 'Method not found' } });
+});
+
+app.get('/api/tools', (req, res) => {
+  res.status(405).send('请使用 POST 方法访问 /api/tools');
 });
 
 app.get('/', (req, res) => {
