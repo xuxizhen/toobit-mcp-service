@@ -11,144 +11,76 @@ const toobit = new ToobitAPI(apiKey, apiSecret);
 router.get('/exchangeInfo', async (req, res) => {
   try {
     const result = await toobit.getExchangeInfo();
-    res.json(result.data);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 行情类
-router.get('/depth', async (req, res) => {
-  try {
-    const result = await toobit.getDepth(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.get('/klines', async (req, res) => {
+// 获取深度（order book）
+router.get('/quote/depth', async (req, res) => {
   try {
-    const result = await toobit.getKlines(req.query);
+    const result = await toobit.getQuoteDepth(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.get('/trades', async (req, res) => {
+// 获取最新成交
+router.get('/quote/trades', async (req, res) => {
   try {
-    const result = await toobit.getTrades(req.query);
+    const result = await toobit.getQuoteTrades(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.get('/ticker/24hr', async (req, res) => {
+// 获取K线数据
+router.get('/quote/klines', async (req, res) => {
   try {
-    const result = await toobit.getTicker24hr(req.query);
+    const result = await toobit.getQuoteKlines(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.get('/ticker/price', async (req, res) => {
+// 获取24小时行情
+router.get('/quote/ticker/24hr', async (req, res) => {
   try {
-    const result = await toobit.getTickerPrice(req.query);
+    const result = await toobit.getQuoteTicker24hr(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.get('/ticker/bookTicker', async (req, res) => {
+// 获取最新价格
+router.get('/quote/ticker/price', async (req, res) => {
   try {
-    const result = await toobit.getBookTicker(req.query);
+    const result = await toobit.getQuoteTickerPrice(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-// 交易类
-router.post('/order', async (req, res) => {
+// 获取最优挂单
+router.get('/quote/ticker/bookTicker', async (req, res) => {
   try {
-    const result = await toobit.placeOrder(req.body);
+    const result = await toobit.getQuoteBookTicker(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
   }
 });
 
-router.post('/batchOrders', async (req, res) => {
+// 获取合并深度
+router.get('/quote/depth/merged', async (req, res) => {
   try {
-    const result = await toobit.batchOrders(req.body);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.get('/order', async (req, res) => {
-  try {
-    const result = await toobit.getOrder(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.get('/openOrders', async (req, res) => {
-  try {
-    const result = await toobit.getOpenOrders(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.delete('/order', async (req, res) => {
-  try {
-    const result = await toobit.cancelOrder(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.delete('/batchOrders', async (req, res) => {
-  try {
-    const result = await toobit.cancelBatchOrders(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-// 账户类
-router.get('/account', async (req, res) => {
-  try {
-    const result = await toobit.getAccount(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.get('/asset', async (req, res) => {
-  try {
-    const result = await toobit.getAsset(req.query);
-    res.json({ code: 0, msg: 'success', data: result.data });
-  } catch (err: any) {
-    res.status(500).json({ code: -1, msg: err.message, data: null });
-  }
-});
-
-router.get('/myTrades', async (req, res) => {
-  try {
-    const result = await toobit.getMyTrades(req.query);
+    const result = await toobit.getQuoteDepthMerged(req.query);
     res.json({ code: 0, msg: 'success', data: result.data });
   } catch (err: any) {
     res.status(500).json({ code: -1, msg: err.message, data: null });
