@@ -87,4 +87,75 @@ router.get('/quote/depth/merged', async (req, res) => {
   }
 });
 
+// ========== SSE行情接口 ========== //
+
+function setSSEHeaders(res: any) {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders && res.flushHeaders();
+}
+
+function ssePush(fn: (req: any) => Promise<any>, req: any, res: any, format?: (data: any) => any) {
+  setSSEHeaders(res);
+  let stopped = false;
+  req.on('close', () => { stopped = true; });
+  const send = async () => {
+    try {
+      const result = await fn(req);
+      const data = format ? format(result) : result?.data;
+      res.write(`data: ${JSON.stringify({ code: 0, msg: 'success', data })}\n\n`);
+    } catch (err: any) {
+      res.write(`data: ${JSON.stringify({ code: -1, msg: err.message, data: null })}\n\n`);
+    }
+  };
+  (async function loop() {
+    while (!stopped) {
+      await send();
+      await new Promise(r => setTimeout(r, 2000));
+    }
+    res.end();
+  })();
+}
+
+// 交易所信息 SSE（一般不需要实时推送，仅做演示）
+router.get('/exchangeInfo/stream', (req, res) => {
+  ssePush(() => toobit.getExchangeInfo(), req, res);
+});
+
+// 深度（order book） SSE
+router.get('/quote/depth/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteDepth(req.query), req, res);
+});
+
+// 最新成交 SSE
+router.get('/quote/trades/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteTrades(req.query), req, res);
+});
+
+// K线数据 SSE
+router.get('/quote/klines/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteKlines(req.query), req, res);
+});
+
+// 24小时行情 SSE
+router.get('/quote/ticker/24hr/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteTicker24hr(req.query), req, res);
+});
+
+// 最新价格 SSE
+router.get('/quote/ticker/price/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteTickerPrice(req.query), req, res);
+});
+
+// 最优挂单 SSE
+router.get('/quote/ticker/bookTicker/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteBookTicker(req.query), req, res);
+});
+
+// 合并深度 SSE
+router.get('/quote/depth/merged/stream', (req, res) => {
+  ssePush((req) => toobit.getQuoteDepthMerged(req.query), req, res);
+});
+
 export default router; 
