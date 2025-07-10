@@ -102,6 +102,45 @@ toobit-mcp-service/
     GET http://localhost:3000/mcp/spot/quote/depth/merged?symbol=BTCUSDT&limit=20
     ```
 
+## SSE（Server-Sent Events）实时行情接口
+
+所有行情接口均支持SSE实时推送，路径为原有RESTful接口后加 `/stream`，如：
+
+- `/mcp/spot/quote/ticker/price/stream`
+- `/mcp/spot/quote/trades/stream`
+- `/mcp/spot/quote/klines/stream`
+- `/mcp/spot/quote/depth/stream`
+- `/mcp/spot/quote/ticker/24hr/stream`
+- `/mcp/spot/quote/ticker/bookTicker/stream`
+- `/mcp/spot/quote/depth/merged/stream`
+- `/mcp/spot/exchangeInfo/stream`（演示用）
+
+### SSE接口特点
+- 每2秒推送一次最新数据，格式同RESTful接口。
+- 前端可用`EventSource`直接接收推送。
+- 适合实时行情、K线、深度、成交等场景。
+
+### 前端SSE接收示例（JavaScript）
+```js
+const es = new EventSource('http://localhost:3000/mcp/spot/quote/ticker/price/stream?symbol=BTCUSDT');
+es.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  if (msg.code === 0) {
+    console.log('最新价格:', msg.data);
+  } else {
+    console.error('SSE错误:', msg.msg);
+  }
+};
+es.onerror = (err) => {
+  console.error('SSE连接异常', err);
+};
+```
+
+### 注意事项
+- SSE为单向推送，适合行情类高频更新。
+- 如需停止接收，调用`es.close()`。
+- 可根据业务调整推送频率和数据内容。
+
 ## 返回格式
 - 所有接口返回：
   ```json
